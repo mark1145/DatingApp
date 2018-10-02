@@ -31,6 +31,8 @@ namespace DatingApp.API
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddCors();
+
+            //Authentication middleware
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme) //Telling Asp.NetCore what kind of Token authentication we're using
                 .AddJwtBearer(options =>
                 {
