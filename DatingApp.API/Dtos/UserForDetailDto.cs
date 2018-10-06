@@ -1,18 +1,15 @@
+﻿using DatingApp.API.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
-namespace DatingApp.API.Models
+namespace DatingApp.API.Dtos
 {
-    public class User
+    public class UserForDetailDto
     {
-        // TODO : I don't like having such beasty objects, keep this just to id/username/password salt + hash; abstract rest to new tables
         public int Id { get; set; }
         public string Username { get; set; }
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
         public string Gender { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public int Age { get; set; }
         public string KnownAs { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastActive { get; set; }
@@ -21,7 +18,7 @@ namespace DatingApp.API.Models
         public string Interests { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
-        public ICollection<Photo> Photos { get; set; }
-
+        public string PhotoUrl { get; set; }
+        public ICollection<PhotosForDetailDto> Photos { get; set; } //Automapper picks up on Photo; inside the Photo it will return whole User class
     }
 }

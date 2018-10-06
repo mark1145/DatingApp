@@ -29,6 +29,7 @@ namespace DatingApp.API.Repository
             return user;
         }
 
+        //TODO : Move this to Hashing/Salting token file
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using(var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
@@ -37,12 +38,13 @@ namespace DatingApp.API.Repository
                 for(int i = 0; i < computedHash.Length; i++)
                 {
                     if (computedHash[i] != passwordHash[i])
-                    return false;
+                        return false;
                 }
             }
             return true;
         }
 
+        // TODO : I don't like that this method is both encrypting AND storing in the database; abstract this encryption logic away 
         public async Task<User> Register(string username, string password)
         {
             User user = new User { Username = username };
@@ -59,9 +61,13 @@ namespace DatingApp.API.Repository
             return user;
         }
 
+        //TODO : Abstract this encryption logic to new class
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using(var hmac = new System.Security.Cryptography.HMACSHA512())
+            //The passwordHash is already salted thus no need to combine the two.
+            //The passwordSalt is stored so that later on when the user logs in; when we create the HMAC obj; we give it the
+            //same key so that we are able to compare each byte of the SHA512
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
             {
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));

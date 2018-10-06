@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using DatingApp.API.Interfaces;
 using DatingApp.API.Repository;
-using DatingApp.API.Dtos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -15,6 +14,7 @@ using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using DatingApp.API.Helpers;
+using AutoMapper;
 
 namespace DatingApp.API
 {
@@ -30,10 +30,14 @@ namespace DatingApp.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(); //AutoMapper.Extensions.Microsoft.DependencyInjection; it's for mapping models to Dtos
             services.AddScoped<IValueRepository, ValueRepository>();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IDatingRepository, DatingRepository>();
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddJsonOptions(opt => opt.SerializerSettings.ReferenceLoopHandling // because in model User has many Photos and a Photo has one user (referencing each other)
+                    = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddCors();
 
             //Authentication middleware
@@ -75,6 +79,7 @@ namespace DatingApp.API
 
             //app.UseHttpsRedirection();
 
+            //seeder.SeedUsers();
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
