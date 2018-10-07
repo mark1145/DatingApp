@@ -1,0 +1,10 @@
+<div class="container mt-5">
+  <div class="row">
+    <div *ngFor="let user of users" class="col-lg-2 col-md-3 col-sm-6">
+       <!-- on large screen each column made up of 2 thus 6 per page; on medium it will be 4; on small 2 -->
+       <app-member-card [user]="user"> <!--Here we're passing the user down that we're using as input property for the MemberCardComponent-->
+
+       </app-member-card>
+    </div>
+  </div>
+</div>
