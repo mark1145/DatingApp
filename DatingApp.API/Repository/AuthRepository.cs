@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using DatingApp.API.Data;
 using DatingApp.API.Interfaces;
 using DatingApp.API.Models;
@@ -10,10 +11,12 @@ namespace DatingApp.API.Repository
     public class AuthRepository : IAuthRepository
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public AuthRepository(DataContext context)
+        public AuthRepository(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<User> LoginAsync(string username, string password)
@@ -45,10 +48,8 @@ namespace DatingApp.API.Repository
         }
 
         // TODO : I don't like that this method is both encrypting AND storing in the database; abstract this encryption logic away 
-        public async Task<User> Register(string username, string password)
+        public async Task<User> Register(User user, string password)
         {
-            User user = new User { Username = username };
-            
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
