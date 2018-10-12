@@ -12,9 +12,10 @@ import { AuthService } from '../../_services/auth.service';
   styleUrls: ['./member-edit.component.css']
 })
 export class MemberEditComponent implements OnInit {
-  @ViewChild('editForm') editForm: NgForm;
-  // userId is passed to the class by reading id from JwT token
-  user: User;
+  @ViewChild('editForm') editForm: NgForm; // need this for accessing the form
+
+  user: User; // userId is passed to the class by reading id from JwT token
+  photoUrl: string;
 
   // Encase user closes the browser by mistake whilst editing the profile
   @HostListener('window:beforeunload', ['$event'])
@@ -33,6 +34,7 @@ export class MemberEditComponent implements OnInit {
     this.route.data.subscribe(data => {
       this.user = data['user'];
     });
+    this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
   }
 
   updateUser() {
@@ -47,4 +49,7 @@ export class MemberEditComponent implements OnInit {
 
   }
 
+  updateMainPhoto(photoUrl) {
+    this.user.photoUrl = photoUrl;
+  }
 }

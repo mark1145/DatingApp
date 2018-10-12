@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using DatingApp.API.Helpers;
 using AutoMapper;
+using DatingApp.API.DataStructures;
 
 namespace DatingApp.API
 {
@@ -34,6 +35,9 @@ namespace DatingApp.API
             services.AddScoped<IValueRepository, ValueRepository>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IDatingRepository, DatingRepository>();
+            services.AddScoped<IPhotoRepository, PhotoRepository>();
+            services.AddScoped<IPhotosHosting, PhotosHosting>();
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings")); //Bring it into class by injecting IOptions<CloudinarySettings>
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(opt => opt.SerializerSettings.ReferenceLoopHandling // because in model User has many Photos and a Photo has one user (referencing each other)
@@ -82,7 +86,7 @@ namespace DatingApp.API
             //seeder.SeedUsers();
             app.UseDefaultFiles();
             app.UseStaticFiles();
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); //don't use AllowCredentials(), it'll send cookies and we're using JwT
             app.UseAuthentication(); //JwT tokens
             app.UseMvc();
         }

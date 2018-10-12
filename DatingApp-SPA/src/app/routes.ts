@@ -22,7 +22,10 @@ export const appRoutes: Routes = [
             { path: 'members', component: MemberListComponent,
                 resolve: { users: MemberListResolver } },
             { path: 'members/:id', component: MemberDetailComponent,
-                resolve: { user: MemberDetailResolver } }, // this is how we access data from the routes
+        // This tells Angular Router to resolve data using MemberDetailResolver and assign
+        // the resolver’s return value as User in the route’s data.
+        // A route’s data can then be accessed from the ActivatedRoute or ActivatedRouteSnapshot
+                resolve: { user: MemberDetailResolver } },
             { path: 'member/edit', component: MemberEditComponent,
                 resolve: { user: MemberEditResolver },
                 canDeactivate: [PreventUnsavedChanges] }, // encase user clicks another link by mistake

@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from '../../environments/environment';
+import { User } from '../_models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +13,20 @@ export class AuthService {
   baseUrl = environment.apiUrl + 'auth/';
   jwtHelper = new JwtHelperService();
   decodedToken: any;
+  currentUser: User;
+
+  // helping us to communicate between none connected components
+  // BehaviorSubject can be called and set from anywhere, it must have a value
+  // Unlike an observable, maybe things can subscribe to it
+  // For just fetching the value; subscription is not neccessary
+  photoUrl = new BehaviorSubject<string>('../../assets/user.png');
+  currentPhotoUrl = this.photoUrl.asObservable();
 
   constructor(private http: HttpClient) { }
+
+  changeMemberPhoto(newPhotoUrl: string) {
+    this.photoUrl.next(newPhotoUrl);
+  }
 
   login(model: any) {
     return this.http.post(this.baseUrl + 'login', model)
@@ -21,8 +35,10 @@ export class AuthService {
           const user = response;
           if (user) {
             localStorage.setItem('tokenStr', user.tokenStr);
+            localStorage.setItem('user', JSON.stringify(user.user));
+            this.currentUser = user.user;
             this.decodedToken = this.jwtHelper.decodeToken(user.tokenStr);
-            console.log(this.decodedToken);
+            this.changeMemberPhoto(this.currentUser.photoUrl);
           }
         })
       );
