@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DatingApp.API.Dtos;
+using DatingApp.API.Helpers;
 using DatingApp.API.Interfaces;
 using DatingApp.API.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace DatingApp.API.Controllers
 {
+    [ServiceFilter(typeof(LogUserActivity))]
     [Authorize]
     [Route("api/[controller]")] // localhost:5000/api/users
     [ApiController]
@@ -27,11 +29,24 @@ namespace DatingApp.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
         {
-            var users = await _datingRepository.GetUsers();
+            Claim claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+                return UnprocessableEntity("Unable to find NameIdentifier on Claim");
 
-            var ret = _mapper.Map<IEnumerable<UserForListDto>>(users); //_mapper.Map<typeof source>(source);
+            int userId = int.Parse(claim.Value);
+            User thisUser = await _datingRepository.GetUser(userId);
+            userParams.UserId = userId;
+
+            if (string.IsNullOrEmpty(userParams.Gender))
+                userParams.Gender = thisUser.Gender.ToLower() == "male" ? "female" : "male";
+
+            var users = await _datingRepository.GetUsers(userParams);
+
+            var ret = _mapper.Map<IEnumerable<UserForListDto>>(users);
+
+            Response.AddPagination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
 
             return Ok(ret);
         }
