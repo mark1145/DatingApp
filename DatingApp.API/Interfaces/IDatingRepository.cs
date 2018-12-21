@@ -16,10 +16,8 @@ namespace DatingApp.API.Interfaces
 
         void Delete<T>(T entity) where T : class;
 
-        Task<bool> SaveAll();
+        void Update<T>(T entity) where T : class;
 
-        Task<PageList<User>> GetUsers(UserParams userParams);
-
-        Task<User> GetUser(int id);
+        Task<bool> SaveAllAsync();
     }
 }

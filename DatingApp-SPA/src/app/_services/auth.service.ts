@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from '../../environments/environment';
 import { User } from '../_models/user';
+import { JwtToken } from '../_models/jwtToken';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ import { User } from '../_models/user';
 export class AuthService {
   baseUrl = environment.apiUrl + 'auth/';
   jwtHelper = new JwtHelperService();
-  decodedToken: any;
+  decodedToken: JwtToken;
   currentUser: User;
 
   // helping us to communicate between none connected components

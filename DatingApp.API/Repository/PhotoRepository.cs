@@ -2,6 +2,7 @@
 using DatingApp.API.Interfaces;
 using DatingApp.API.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,9 +12,10 @@ namespace DatingApp.API.Repository
     {
         public readonly DataContext _repository;
 
-        public PhotoRepository(DataContext repository)
+        public PhotoRepository(DataContext _dataContext)
         {
-            _repository = repository;
+            _repository = _dataContext;
+            Console.WriteLine(_dataContext.GetHashCode() + " photoRepo");
         }
 
         public void DeletePhoto(Photo photo)

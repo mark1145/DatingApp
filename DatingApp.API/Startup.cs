@@ -33,9 +33,11 @@ namespace DatingApp.API
         {
             services.AddAutoMapper(); //AutoMapper.Extensions.Microsoft.DependencyInjection; it's for mapping models to Dtos
             services.AddScoped<IValueRepository, ValueRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IDatingRepository, DatingRepository>();
             services.AddScoped<IPhotoRepository, PhotoRepository>();
+            services.AddScoped<ILikeRepository, LikeRepository>();
             services.AddScoped<IPhotosHosting, PhotosHosting>();
             services.AddScoped<LogUserActivity>();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings")); //Bring it into class by injecting IOptions<CloudinarySettings>

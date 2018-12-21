@@ -20,11 +20,15 @@ namespace DatingApp.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IDatingRepository _datingRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ILikeRepository _likeRepository;
         private readonly IMapper _mapper;
 
-        public UsersController(IDatingRepository datingRepository, IMapper mapper)
+        public UsersController(IDatingRepository datingRepository, IUserRepository userRepository, ILikeRepository likeRepository, IMapper mapper)
         {
             _datingRepository = datingRepository;
+            _userRepository = userRepository;
+            _likeRepository = likeRepository;
             _mapper = mapper;
         }
 
@@ -36,13 +40,13 @@ namespace DatingApp.API.Controllers
                 return UnprocessableEntity("Unable to find NameIdentifier on Claim");
 
             int userId = int.Parse(claim.Value);
-            User thisUser = await _datingRepository.GetUser(userId);
+            User thisUser = await _userRepository.GetUserAsync(userId);
             userParams.UserId = userId;
 
             if (string.IsNullOrEmpty(userParams.Gender))
                 userParams.Gender = thisUser.Gender.ToLower() == "male" ? "female" : "male";
 
-            var users = await _datingRepository.GetUsers(userParams);
+            var users = await _userRepository.GetUsersAsync(userParams);
 
             var ret = _mapper.Map<IEnumerable<UserForListDto>>(users);
 
@@ -54,7 +58,7 @@ namespace DatingApp.API.Controllers
         [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(int id)
         {
-            var user = await _datingRepository.GetUser(id);
+            var user = await _userRepository.GetUserAsync(id);
 
             var ret = _mapper.Map<UserForDetailDto>(user);
 
@@ -72,14 +76,45 @@ namespace DatingApp.API.Controllers
             if (id != int.Parse(claim.Value))
                 return Unauthorized();
 
-            User user = await _datingRepository.GetUser(id);
+            User user = await _userRepository.GetUserAsync(id);
 
             _mapper.Map(userForUpdateDto, user);
 
-            if (await _datingRepository.SaveAll())
+            if (await _datingRepository.SaveAllAsync())
                 return NoContent();
 
             throw new Exception($"Updating user {id} failed on save to database");
+        }
+
+        [HttpPost("{id}/like/{recepientId}")]
+        public async Task<IActionResult> LikeUser(int id, int recepientId)
+        {
+            Claim claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+                return UnprocessableEntity("Unable to find NameIdentifier on Claim");
+
+            //1. Make sure that user trying to update the profile is matching the profile their trying to update
+            if (id != int.Parse(claim.Value))
+                return Unauthorized();
+
+            if (await _likeRepository.IsUserAlreadyLikedAsync(id, recepientId))
+                return BadRequest("You already liked this user");
+
+            if (await _userRepository.GetUserAsync(recepientId) == null)
+                return NotFound("Cannot find user");
+
+            Like like = new Like
+            {
+                LikerId = id,
+                LikeeId = recepientId
+            };
+
+            _datingRepository.Add<Like>(like);
+
+            if (await _datingRepository.SaveAllAsync())
+                return Ok();
+
+            return BadRequest("Failed to like user");
         }
     }
 }

@@ -13,6 +13,19 @@ import { catchError } from 'rxjs/operators';
 export class MemberDetailResolver implements Resolve<User> {
     constructor(private userService: UserService, private router: Router, private alertify: AlertifyService) { }
 
+    // General Routing Flow.
+    // 1) User clicks the link.
+    // 2) Angular loads the respective component.
+    // Routing Flow with Resolver
+    // 1) User clicks the link.
+    // 2) Angular executes certain code and returns a value or observable.
+    // 3) You can collect the returned value or observable in constructor or in ngOnInit, in class of your component which is about to load.
+    // 4) Use the collected the data for your purpose.
+    // 5) Now you can load your component.
+    //
+    // Steps 2,3 and 4 are done with a code called Resolver.
+    // So basically resolver is that intermediate code, which can be executed when a link has been clicked and before a component is loaded.
+
     // The resolve method returns an observable of the type User, so Angular Router
     // will wait for the observable to complete before the route’s component is activated.
     // This is then stored in route.data['user'] where it can be accessed in the component by

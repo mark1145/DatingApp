@@ -17,6 +17,7 @@ namespace DatingApp.API.Repository
         {
             _context = context;
             _mapper = mapper;
+            Console.WriteLine(_context.GetHashCode() + " authRepo");
         }
 
         public async Task<User> LoginAsync(string username, string password)

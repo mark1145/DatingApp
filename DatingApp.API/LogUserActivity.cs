@@ -13,11 +13,6 @@ namespace DatingApp.API
 {
     public class LogUserActivity : IAsyncActionFilter
     {
-        public LogUserActivity()
-        {
-
-        }
-
         /// <summary>
         /// Whenever the user does something it will update and save new User.LastActive
         /// </summary>
@@ -31,10 +26,11 @@ namespace DatingApp.API
             int userId = int.Parse(resultContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             //Fetching the repository service out of the current HttpContext
-            var repo = resultContext.HttpContext.RequestServices.GetService<IDatingRepository>();
-            User user = await repo.GetUser(userId);
+            var userRepo = resultContext.HttpContext.RequestServices.GetService<IUserRepository>();
+            var genericRepo = resultContext.HttpContext.RequestServices.GetService<IDatingRepository>();
+            User user = await userRepo.GetUserAsync(userId);
             user.LastActive = DateTime.UtcNow;
-            await repo.SaveAll();
+            await genericRepo.SaveAllAsync();
         }
     }
 }
