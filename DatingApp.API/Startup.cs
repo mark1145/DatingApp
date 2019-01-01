@@ -39,6 +39,8 @@ namespace DatingApp.API
             services.AddScoped<IPhotoRepository, PhotoRepository>();
             services.AddScoped<ILikeRepository, LikeRepository>();
             services.AddScoped<IPhotosHosting, PhotosHosting>();
+            services.AddScoped<IJwtClaimValidator, JwtClaimValidator>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<LogUserActivity>();
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings")); //Bring it into class by injecting IOptions<CloudinarySettings>
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));

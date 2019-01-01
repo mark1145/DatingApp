@@ -1,4 +1,5 @@
 ﻿using DatingApp.API.Data;
+using DatingApp.API.Dtos;
 using DatingApp.API.Helpers;
 using DatingApp.API.Interfaces;
 using DatingApp.API.Models;
@@ -22,6 +23,13 @@ namespace DatingApp.API.Repository
         }
 
         public async Task<User> GetUserAsync(int id)
+        {
+            var user = await _dataContext.Users.FirstOrDefaultAsync(y => y.Id == id);
+
+            return user;
+        }
+
+        public async Task<User> GetUserPhotoAsync(int id)
         {
             var user = await _dataContext.Users.Include(x => x.Photos).FirstOrDefaultAsync(y => y.Id == id);
 

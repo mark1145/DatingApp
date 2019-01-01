@@ -68,7 +68,7 @@ namespace DatingApp.API.Controllers
 
             Photo photo = await _photosHosting.StorePhoto(photoForCreationDto);
 
-            User user = await _userRepository.GetUserAsync(userId);
+            User user = await _userRepository.GetUserPhotoAsync(userId);
                        
             if (!user.Photos.Any())
                 photo.IsMain = true;
@@ -101,7 +101,7 @@ namespace DatingApp.API.Controllers
             if (userId != int.Parse(claim.Value))
                 return Unauthorized();
 
-            User user = await _userRepository.GetUserAsync(userId);
+            User user = await _userRepository.GetUserPhotoAsync(userId);
 
             // Need to make sure that user is updating THEIR photo
             if (!user.Photos.Any(x => x.Id == photoId))
@@ -134,7 +134,7 @@ namespace DatingApp.API.Controllers
             if (userId != int.Parse(claim.Value))
                 return Unauthorized();
 
-            User user = await _userRepository.GetUserAsync(userId);
+            User user = await _userRepository.GetUserPhotoAsync(userId);
 
             // Need to make sure that user is updating THEIR photo
             if (!user.Photos.Any(x => x.Id == photoId))
